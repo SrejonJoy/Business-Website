@@ -1,15 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const Header = () => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchUser = async () => {
+      try {
+        await axios.get('/sanctum/csrf-cookie');
+        const res = await axios.get('/api/user');
+        if (mounted) setUser(res.data);
+      } catch (e) {
+        // not authenticated or error
+      }
+    };
+    fetchUser();
+    return () => { mounted = false; };
+  }, []);
+
+  const isAdmin = user && user.role === 'admin';
+
   return (
     <header>
       <div style={styles.topBar}>
         <div style={styles.topLeft}></div>
         <div style={styles.topRight}>
-          <a style={styles.topLink}>Track Order</a>
-          <a style={styles.topLink}>Help</a>
-          <a style={styles.topLink}>My Account</a>
-          <a style={styles.topLink}>Cart</a>
+          {isAdmin && <a href="/admin" style={styles.topLink}>Admin Control</a>}
+          <a href="/track-order" style={styles.topLink}>Track Order</a>
+          <a href="/help" style={styles.topLink}>Help</a>
+          <a href="/account" style={styles.topLink}>My Account</a>
+          <a href="/cart" style={styles.topLink}>Cart</a>
         </div>
       </div>
 
