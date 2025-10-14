@@ -25,4 +25,10 @@ use App\Http\Controllers\API\AuthController;
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    
+    // Admin-only API
+    Route::middleware('admin')->prefix('admin')->group(function () {
+        Route::get('/users', [\App\Http\Controllers\API\AdminController::class, 'users']);
+        Route::post('/users/{id}/role', [\App\Http\Controllers\API\AdminController::class, 'updateRole']);
+    });
 });
