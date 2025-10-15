@@ -4,6 +4,7 @@ import LoginPage from './LoginPage';
 import DashboardPage from './DashboardPage';
 import AdminPage from './AdminPage';
 import Header from './components/Header';
+import Footer from './components/Footer';
 
 function AppContent() {
   const location = useLocation();
@@ -20,6 +21,7 @@ function AppContent() {
         {/* Redirect root path to the login page */}
         <Route path="/" element={<LoginPage />} />
       </Routes>
+      <Footer />
     </div>
   );
 }
