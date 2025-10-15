@@ -26,7 +26,7 @@ const Header = () => {
       <div style={styles.topBar}>
         <div style={styles.topLeft}></div>
         <div style={styles.topRight}>
-          {isAdmin && <a href="/admin" style={styles.topLink}>Admin Control</a>}
+          {isAdmin && <a href="/admin/roles" style={styles.topLink}>Admin Control</a>}
           <a href="/track-order" style={styles.topLink}>Track Order</a>
           <a href="/help" style={styles.topLink}>Help</a>
           <a href="/account" style={styles.topLink}>My Account</a>

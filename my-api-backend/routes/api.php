@@ -30,5 +30,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('admin')->prefix('admin')->group(function () {
         Route::get('/users', [\App\Http\Controllers\API\AdminController::class, 'users']);
         Route::post('/users/{id}/role', [\App\Http\Controllers\API\AdminController::class, 'updateRole']);
+        // Orders, payments and product (jersey) management
+        Route::get('/orders', [\App\Http\Controllers\API\AdminController::class, 'orders']);
+        Route::get('/payments', [\App\Http\Controllers\API\AdminController::class, 'payments']);
+        Route::post('/products', [\App\Http\Controllers\API\AdminController::class, 'addProduct']);
+    Route::get('/products', [\App\Http\Controllers\API\AdminController::class, 'listProducts']);
+        Route::put('/products/{id}', [\App\Http\Controllers\API\AdminController::class, 'editProduct']);
+        Route::delete('/products/{id}', [\App\Http\Controllers\API\AdminController::class, 'removeProduct']);
+        Route::post('/products/upload', [\App\Http\Controllers\API\AdminController::class, 'uploadImage']);
+        Route::post('/products/{id}/discount', [\App\Http\Controllers\API\AdminController::class, 'discountProduct']);
     });
+    // Temporary public debug endpoint (no admin middleware) - remove in production
+    Route::get('/public/products', [\App\Http\Controllers\API\AdminController::class, 'listPublicProducts']);
 });

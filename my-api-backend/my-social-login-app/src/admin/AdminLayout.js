@@ -19,7 +19,7 @@ const activeExtra = {
   background: 'linear-gradient(180deg,#fff,#f0f6ff)'
 };
 
-export default function AdminPage() {
+export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
