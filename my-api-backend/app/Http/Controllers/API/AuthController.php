@@ -26,7 +26,13 @@ class AuthController extends Controller
     public function handleProviderCallback($provider)
     {
         // Use stateful Socialite (do NOT call ->stateless()) so the provider state is validated
-        $socialUser = Socialite::driver($provider)->user();
+        try {
+            $socialUser = Socialite::driver($provider)->user();
+        } catch (\Exception $e) {
+            // Log and redirect back to frontend with an error flag
+            logger()->error('Socialite callback failed', ['provider' => $provider, 'error' => $e->getMessage()]);
+            return redirect('http://localhost:3000/login?social_error=1');
+        }
 
         // Use the provider email when available; otherwise create a unique fallback
         $email = $socialUser->getEmail() ?? strtolower($provider . '_' . $socialUser->getId() . '@no-email.local');
