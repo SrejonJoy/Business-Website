@@ -27,17 +27,27 @@ if (process.env.REACT_APP_API_BASE_URL) {
   console.info('[env] REACT_APP_API_BASE_URL not set; using relative URLs');
 }
 
+// Helper to get cookie value by name (works cross-domain with credentials)
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    return parts.pop().split(';').shift();
+  }
+  return null;
+}
+
 // Add axios interceptor to automatically send XSRF token for Sanctum CSRF protection
 axios.interceptors.request.use((config) => {
-  // Read XSRF-TOKEN cookie and send as X-XSRF-TOKEN header for state-changing requests
+  // For state-changing requests, read XSRF-TOKEN cookie and send as X-XSRF-TOKEN header
   if (['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase())) {
-    const token = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('XSRF-TOKEN='))
-      ?.split('=')[1];
+    const token = getCookie('XSRF-TOKEN');
     if (token) {
-      // Decode the token (Laravel encodes it)
+      // Decode the token (Laravel URL-encodes it)
       config.headers['X-XSRF-TOKEN'] = decodeURIComponent(token);
+      console.debug('[csrf] Sending X-XSRF-TOKEN header with', config.method.toUpperCase(), config.url);
+    } else {
+      console.warn('[csrf] No XSRF-TOKEN cookie found for', config.method.toUpperCase(), config.url);
     }
   }
   return config;
