@@ -12,6 +12,15 @@ const DashboardPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check if token is in URL (from OAuth redirect)
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      localStorage.setItem('auth_token', token);
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     // Fetch the current user when the component loads
     const fetchUser = async () => {
       try {
@@ -19,6 +28,8 @@ const DashboardPage = () => {
         setUser(response.data);
       } catch (error) {
         console.error('Not authenticated', error);
+        // Clear invalid token
+        localStorage.removeItem('auth_token');
         navigate('/login'); // Redirect to login if not authenticated
       }
     };
@@ -56,13 +67,16 @@ const DashboardPage = () => {
 
   const handleLogout = async () => {
     try {
-      // Ensure CSRF cookie/token is present for the POST
-      await axios.get('/sanctum/csrf-cookie');
-      await axios.post('/logout');
+      await axios.post('/api/logout');
+      // Clear the auth token
+      localStorage.removeItem('auth_token');
       setUser(null);
       navigate('/login');
     } catch (error) {
       console.error('Logout failed', error);
+      // Clear token anyway
+      localStorage.removeItem('auth_token');
+      navigate('/login');
     }
   };
   // Products state for public listing (hooks must be declared unconditionally)

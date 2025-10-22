@@ -49,9 +49,12 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-    // Redirect to the frontend app (dashboard/home)
-    $frontend = rtrim(config('app.frontend_url'), '/');
-    return redirect($frontend . '/dashboard');
+        // Create a personal access token for the user
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        // Redirect to the frontend app with the token in the URL
+        $frontend = rtrim(config('app.frontend_url'), '/');
+        return redirect($frontend . '/dashboard?token=' . urlencode($token));
     }
     // Handle Guest Login
     public function guestLogin(Request $request)
@@ -65,7 +68,14 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        return response()->json(['message' => 'Guest login successful']);
+        // Create a personal access token for the user
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Guest login successful',
+            'token' => $token,
+            'user' => $user
+        ]);
     }
 
     // Get Authenticated User

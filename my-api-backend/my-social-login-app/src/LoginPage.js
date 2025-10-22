@@ -16,9 +16,11 @@ const LoginPage = () => {
   // Function to handle guest login via an API call
   const handleGuestLogin = async () => {
     try {
-      // Ensure Sanctum CSRF cookie is set first (only needed for session-based auth)
-      await axios.get('/sanctum/csrf-cookie');
-      await axios.post('/api/auth/guest');
+      const response = await axios.post('/api/auth/guest');
+      // Store the token from response
+      if (response.data.token) {
+        localStorage.setItem('auth_token', response.data.token);
+      }
       // On success, navigate to the dashboard
       window.location.href = '/dashboard';
     } catch (error) {
