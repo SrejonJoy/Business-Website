@@ -23,6 +23,10 @@ RUN composer install --no-dev --no-scripts --prefer-dist --no-interaction --no-p
 # Copy the rest of the application
 COPY . .
 
+# Ensure runtime writable directories exist and are permissive for PaaS ephemeral FS
+RUN mkdir -p storage/framework/{cache,sessions,views} bootstrap/cache \
+    && chmod -R 777 storage bootstrap/cache
+
 # Ensure vendor is up to date after full source is copied (now scripts can run)
 RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
 
