@@ -24,10 +24,13 @@ return [
     'allowed_origins' => array_values(array_filter(array_map('trim', explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:3001'))))),
 
     // allow localhost and 127.0.0.1 on any port during development
-    'allowed_origins_patterns' => [
+    // You can optionally allow additional origins via regex patterns from env
+    // Example for all Vercel previews for your project: "/\.vercel\.app$/"
+    // Set CORS_ALLOWED_ORIGINS_PATTERNS to a comma-separated list of regex patterns
+    'allowed_origins_patterns' => array_merge([
         '/^https?:\/\/localhost(:[0-9]+)?$/',
         '/^https?:\/\/127\.0\.0\.1(:[0-9]+)?$/'
-    ],
+    ], array_values(array_filter(array_map('trim', explode(',', env('CORS_ALLOWED_ORIGINS_PATTERNS', '')))))),
 
     'allowed_headers' => ['*'],
 
