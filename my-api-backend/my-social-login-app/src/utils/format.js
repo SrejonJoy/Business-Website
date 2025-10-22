@@ -6,7 +6,13 @@ export function formatTaka(value) {
 
 export function drivePreview(url) {
   if (!url || typeof url !== 'string') return url;
-  // common Google Drive share formats:
+  
+  // If it's already an absolute URL (from Railway storage), return as-is
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  
+  // Handle Google Drive share formats:
   // https://drive.google.com/file/d/FILEID/view?usp=sharing
   // https://drive.google.com/open?id=FILEID
   // https://drive.google.com/uc?id=FILEID&export=download
