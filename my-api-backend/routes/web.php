@@ -30,11 +30,24 @@ Route::get('/health', function () {
 
 // Serve storage files (for PHP built-in server that doesn't follow symlinks properly)
 Route::get('/storage/{path}', function ($path) {
+    \Log::info('Storage route hit', ['path' => $path]);
     $filePath = storage_path('app/public/' . $path);
+    \Log::info('Looking for file', ['filePath' => $filePath, 'exists' => file_exists($filePath)]);
     if (!file_exists($filePath)) {
-        abort(404);
+        \Log::error('File not found', ['filePath' => $filePath]);
+        abort(404, 'File not found: ' . $filePath);
     }
     return response()->file($filePath);
+})->where('path', '.*');
+
+// Serve media via Storage facade to avoid symlink issues completely
+Route::get('/media/{path}', function ($path) {
+    $disk = \Illuminate\Support\Facades\Storage::disk('public');
+    if (!$disk->exists($path)) {
+        abort(404);
+    }
+    // Will set appropriate headers and stream file
+    return $disk->response($path);
 })->where('path', '.*');
 
 use App\Http\Controllers\API\AuthController;

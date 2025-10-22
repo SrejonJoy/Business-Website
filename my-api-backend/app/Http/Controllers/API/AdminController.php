@@ -235,9 +235,10 @@ class AdminController extends Controller
             }
         }
 
-        // Generate full absolute URL for cross-domain access
-        $relativeUrl = Storage::url($resizedPath);
-        $absoluteUrl = config('app.url') . $relativeUrl;
+    // Generate full absolute URL for cross-domain access
+    // Use Laravel-served media route instead of relying on public/storage symlink
+    $relativeUrl = '/media/' . ltrim($resizedPath, '/');
+    $absoluteUrl = rtrim(config('app.url'), '/') . $relativeUrl;
 
         return response()->json(['url' => $absoluteUrl, 'path' => $resizedPath, 'original' => $path]);
     }
