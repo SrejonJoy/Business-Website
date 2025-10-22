@@ -15,10 +15,13 @@ WORKDIR /app
 COPY composer.json composer.lock* ./
 
 # Install PHP dependencies (no dev) and optimize autoloader
-RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader || true
+RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
 
 # Copy the rest of the application
 COPY . .
+
+# Ensure vendor is up to date after full source is copied (handles newly added packages)
+RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
 
 # Expose default port (Railway will set $PORT at runtime; we default to 8080)
 EXPOSE 8080
