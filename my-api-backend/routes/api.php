@@ -34,12 +34,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/orders', [\App\Http\Controllers\API\AdminController::class, 'orders']);
         Route::get('/payments', [\App\Http\Controllers\API\AdminController::class, 'payments']);
         Route::post('/products', [\App\Http\Controllers\API\AdminController::class, 'addProduct']);
-    Route::get('/products', [\App\Http\Controllers\API\AdminController::class, 'listProducts']);
+        Route::get('/products', [\App\Http\Controllers\API\AdminController::class, 'listProducts']);
         Route::put('/products/{id}', [\App\Http\Controllers\API\AdminController::class, 'editProduct']);
         Route::delete('/products/{id}', [\App\Http\Controllers\API\AdminController::class, 'removeProduct']);
         Route::post('/products/upload', [\App\Http\Controllers\API\AdminController::class, 'uploadImage']);
         Route::post('/products/{id}/discount', [\App\Http\Controllers\API\AdminController::class, 'discountProduct']);
     });
-    // Temporary public debug endpoint (no admin middleware) - remove in production
-    Route::get('/public/products', [\App\Http\Controllers\API\AdminController::class, 'listPublicProducts']);
+
+    // Cart APIs (for authenticated users)
+    Route::get('/cart', [\App\Http\Controllers\API\CartController::class, 'getCart']);
+    Route::post('/cart', [\App\Http\Controllers\API\CartController::class, 'saveCart']);
+    Route::post('/cart/add', [\App\Http\Controllers\API\CartController::class, 'addItem']);
+    Route::post('/cart/remove-item', [\App\Http\Controllers\API\CartController::class, 'removeItem']);
+    Route::post('/cart/update-item', [\App\Http\Controllers\API\CartController::class, 'updateItem']);
+    Route::post('/cart/clear', [\App\Http\Controllers\API\CartController::class, 'clear']);
 });
+
+// Temporary public debug endpoint (no auth required) - remove/secure for production
+Route::get('/public/products', [\App\Http\Controllers\API\AdminController::class, 'listPublicProducts']);

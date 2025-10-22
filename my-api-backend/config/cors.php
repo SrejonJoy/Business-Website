@@ -15,13 +15,19 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'login/*', 'logout'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'login/*', 'logout'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:3000'],
+    // allow common local dev origins (adjust if your dev server uses another port)
+    // In production, set CORS_ALLOWED_ORIGINS in env as comma-separated list (e.g., https://app.example.com,https://www.example.com)
+    'allowed_origins' => array_values(array_filter(array_map('trim', explode(',', env('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:3001'))))),
 
-    'allowed_origins_patterns' => [],
+    // allow localhost and 127.0.0.1 on any port during development
+    'allowed_origins_patterns' => [
+        '/^https?:\/\/localhost(:[0-9]+)?$/',
+        '/^https?:\/\/127\.0\.0\.1(:[0-9]+)?$/'
+    ],
 
     'allowed_headers' => ['*'],
 

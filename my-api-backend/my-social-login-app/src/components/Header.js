@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { cartSyncFromServer } from '../utils/cart';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Header = () => {
   const [user, setUser] = useState(null);
+  const [cartCount, setCartCount] = useState(0);
 
+  const navigate = useNavigate();
   useEffect(() => {
     let mounted = true;
     const fetchUser = async () => {
@@ -19,6 +23,35 @@ const Header = () => {
     return () => { mounted = false; };
   }, []);
 
+  // when user logs in, try syncing local cart to server
+  useEffect(() => {
+    if (!user) return;
+    try {
+      const raw = localStorage.getItem('cart') || '[]';
+      const list = JSON.parse(raw);
+      if (list.length === 0) return;
+      // send to server via axios so CSRF cookie is used
+      axios.post('/api/cart', { items: list }).catch(() => {});
+      // also attempt to replace local cart with server version (in case server has saved cart)
+      try { cartSyncFromServer(); } catch(e) {}
+    } catch (e) {}
+  }, [user]);
+
+  useEffect(() => {
+    const calc = () => {
+      try {
+        const raw = localStorage.getItem('cart') || '[]';
+        const list = JSON.parse(raw);
+        const count = list.reduce((s, it) => s + (it.qty || 0), 0);
+        setCartCount(count);
+      } catch (e) { setCartCount(0); }
+    };
+    calc();
+    const h = (e) => setCartCount(e.detail?.count || 0);
+    window.addEventListener('cart-updated', h);
+    return () => window.removeEventListener('cart-updated', h);
+  }, []);
+
   const isAdmin = user && user.role === 'admin';
 
   return (
@@ -30,13 +63,13 @@ const Header = () => {
           <a href="/track-order" style={styles.topLink}>Track Order</a>
           <a href="/help" style={styles.topLink}>Help</a>
           <a href="/account" style={styles.topLink}>My Account</a>
-          <a href="/cart" style={styles.topLink}>Cart</a>
+          <Link to="/cart" style={styles.topLink}>Cart {cartCount > 0 ? <span style={styles.badge}>{cartCount}</span> : null}</Link>
         </div>
       </div>
 
       <div style={styles.middleBar}>
         <div style={styles.logo}>
-          <img src={require('../assets/kitbag-logo.svg').default} alt="Kitbag" style={{height:40}} />
+          <img onClick={() => navigate('/dashboard')} src={require('../assets/kitbag-logo.svg').default} alt="Kitbag" style={{height:40,cursor:'pointer'}} />
         </div>
         <div style={styles.searchWrap}>
           <input placeholder="What can we help you find?" style={styles.search} />
@@ -147,6 +180,16 @@ const styles = {
     color: '#333',
     cursor: 'pointer',
   },
+  badge: {
+    display: 'inline-block',
+    background: '#d23f2f',
+    color: '#fff',
+    borderRadius: 12,
+    padding: '2px 8px',
+    marginLeft: 8,
+    fontSize: 12,
+    verticalAlign: 'middle'
+  }
 };
 
 export default Header;

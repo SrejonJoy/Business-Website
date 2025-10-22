@@ -65,8 +65,18 @@ const AdminJersey = () => {
   const submit = async (e) => {
     e.preventDefault();
     try {
-      await axios.get('/sanctum/csrf-cookie');
-      const res = await axios.post('/api/admin/products', form);
+      try {
+        console.debug('[admin] ensuring CSRF cookie before submit');
+        await axios.get('/sanctum/csrf-cookie');
+        await axios.post('/api/admin/products', form);
+      } catch (err) {
+        console.warn('[admin] submit failed, status=', err?.response?.status, err?.message);
+        if (err?.response?.status === 419) {
+          // try to refresh CSRF cookie and retry once
+          try { console.debug('[admin] 419 received, retrying after CSRF refresh'); await axios.get('/sanctum/csrf-cookie'); await axios.post('/api/admin/products', form); }
+          catch(e) { throw e; }
+        } else throw err;
+      }
       window.dispatchEvent(new CustomEvent('app-toast', { detail: { message: 'Product created', type: 'success', timeout: 3000 } }));
       setForm(initialForm);
       fetchProducts();
@@ -80,18 +90,34 @@ const AdminJersey = () => {
   const uploadImage = async (file) => {
     if (!file) return;
     try {
-      await axios.get('/sanctum/csrf-cookie');
+      // ensure CSRF cookie and retry-on-419
+      try {
+        console.debug('[admin] prefetching CSRF cookie for upload');
+        await axios.get('/sanctum/csrf-cookie');
+      } catch(e) {
+        console.warn('[admin] CSRF prefetch failed, will attempt upload and retry on 419', e && e.message);
+      }
       const fd = new FormData();
       fd.append('image', file);
-      const res = await axios.post('/api/admin/products/upload', fd, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const pct = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            setUploadProgress(pct);
+      let res;
+      try {
+        console.debug('[admin] starting image upload to /api/admin/products/upload', file && file.name, file && file.size);
+        res = await axios.post('/api/admin/products/upload', fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          onUploadProgress: (progressEvent) => {
+            if (progressEvent.total) {
+              const pct = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              setUploadProgress(pct);
+            }
           }
-        }
-      });
+        });
+      } catch (err) {
+        if (err?.response?.status === 419) {
+          // refresh CSRF cookie then retry once
+          try { console.debug('[admin] upload received 419, fetching CSRF cookie and retrying upload'); await axios.get('/sanctum/csrf-cookie'); res = await axios.post('/api/admin/products/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' }, onUploadProgress: (progressEvent) => { if (progressEvent.total) { const pct = Math.round((progressEvent.loaded * 100) / progressEvent.total); setUploadProgress(pct); } } }); }
+          catch (e) { throw e; }
+        } else throw err;
+      }
       if (res.data && res.data.url) {
         setForm(f => ({ ...f, image: res.data.url }));
         setUploadPreview(res.data.url);
@@ -106,9 +132,9 @@ const AdminJersey = () => {
 
   const fetchPublic = async () => {
     try {
-      const res = await axios.get('/api/public/products');
-      console.log('Public products:', res.data);
-      window.dispatchEvent(new CustomEvent('app-toast', { detail: { message: 'Public products count: ' + (res.data?.length || 0), type: 'success' } }));
+      const resp = await axios.get('/api/public/products');
+      console.log('Public products:', resp.data);
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { message: 'Public products count: ' + (resp.data?.length || 0), type: 'success' } }));
     } catch (e) {
       console.error('Public fetch failed', e);
       window.dispatchEvent(new CustomEvent('app-toast', { detail: { message: 'Public fetch failed: ' + (e.response?.status ? e.response.status + ' ' + JSON.stringify(e.response.data) : e.message), type: 'error' } }));

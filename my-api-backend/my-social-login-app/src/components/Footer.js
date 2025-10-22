@@ -36,10 +36,10 @@ const Footer = () => {
             <div style={{marginTop:12, textAlign:'right'}}>
               <div style={{fontWeight:700, marginBottom:6}}>Follow Us</div>
               <div style={styles.socials}>
-                <a href="#" aria-label="facebook" style={styles.iconLink}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 12C22 6.477 17.523 2 12 2S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879v-6.99H7.898v-2.89h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.467h-1.26c-1.242 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33V21.88C18.343 21.127 22 16.99 22 12z" fill="#fff"/></svg></a>
-                <a href="#" aria-label="x" style={styles.iconLink}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.364 5.636L5.636 18.364M5.636 5.636L18.364 18.364" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
-                <a href="#" aria-label="instagram" style={styles.iconLink}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="4" stroke="#fff" strokeWidth="2"/><path d="M12 8a4 4 0 100 8 4 4 0 000-8z" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></a>
-                <a href="#" aria-label="youtube" style={styles.iconLink}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 8.5s-.2-1.4-.8-2c-.7-.8-1.5-.8-1.9-.9C16.7 5 12 5 12 5s-4.7 0-7.3.6c-.4 0-1.2.1-1.9.9-.6.6-.8 2-.8 2S2 10.2 2 11.9v.2c0 1.7.2 3.4.2 3.4s.2 1.4.8 2c.7.8 1.6.8 2 .9C7.3 20 12 20 12 20s4.7 0 7.3-.6c.4 0 1.2-.1 1.9-.9.6-.6.8-2 .8-2s.2-1.7.2-3.4v-.2c0-1.7-.2-3.4-.2-3.4z" stroke="#fff" strokeWidth="0.4"/><path d="M10 14.5l4-2.5-4-2.5v5z" fill="#fff"/></svg></a>
+                <button aria-label="facebook" style={{...styles.iconLink, ...styles.iconButton}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 12C22 6.477 17.523 2 12 2S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879v-6.99H7.898v-2.89h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.467h-1.26c-1.242 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33V21.88C18.343 21.127 22 16.99 22 12z" fill="#fff"/></svg></button>
+                <button aria-label="x" style={{...styles.iconLink, ...styles.iconButton}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18.364 5.636L5.636 18.364M5.636 5.636L18.364 18.364" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
+                <button aria-label="instagram" style={{...styles.iconLink, ...styles.iconButton}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="4" stroke="#fff" strokeWidth="2"/><path d="M12 8a4 4 0 100 8 4 4 0 000-8z" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
+                <button aria-label="youtube" style={{...styles.iconLink, ...styles.iconButton}}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 8.5s-.2-1.4-.8-2c-.7-.8-1.5-.8-1.9-.9C16.7 5 12 5 12 5s-4.7 0-7.3.6c-.4 0-1.2.1-1.9.9-.6.6-.8 2-.8 2S2 10.2 2 11.9v.2c0 1.7.2 3.4.2 3.4s.2 1.4.8 2c.7.8 1.6.8 2 .9C7.3 20 12 20 12 20s4.7 0 7.3-.6c.4 0 1.2-.1 1.9-.9.6-.6.8-2 .8-2s.2-1.7.2-3.4v-.2c0-1.7-.2-3.4-.2-3.4z" stroke="#fff" strokeWidth="0.4"/><path d="M10 14.5l4-2.5-4-2.5v5z" fill="#fff"/></svg></button>
               </div>
             </div>
           </div>
@@ -111,6 +111,16 @@ const styles = {
     fontSize: 14,
     cursor: 'pointer',
   },
+  iconButton: {
+    background: '#111',
+    border: 'none',
+    padding: 8,
+    borderRadius: 6,
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  }
 };
 
 export default Footer;

@@ -3,9 +3,7 @@ import React, { useEffect, useState } from 'react';
 export function showConfirm(message, title = 'Confirm') {
   return new Promise((resolve) => {
     const id = Date.now() + Math.random();
-    const handler = (e) => {
-      if (e.detail && e.detail.id === id) return; // ignore
-    };
+    // dispatch the modal event; the ConfirmModal listener will receive the detail including resolve
     window.dispatchEvent(new CustomEvent('app-confirm', { detail: { id, message, title, resolve } }));
   });
 }

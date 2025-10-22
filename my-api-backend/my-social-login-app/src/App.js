@@ -10,8 +10,30 @@ import AdminJersey from './admin/AdminJersey';
 import AdminJerseyEdit from './admin/AdminJerseyEdit';
 import AdminJerseyRemove from './admin/AdminJerseyRemove';
 import AdminJerseyDiscount from './admin/AdminJerseyDiscount';
+import ProductDetail from './ProductDetail';
+import CartPage from './CartPage';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+function AuthRedirect() {
+  const navigate = useNavigate();
+  React.useEffect(() => {
+    let mounted = true;
+    const check = async () => {
+      try {
+        await axios.get('/api/user');
+        if (mounted) navigate('/dashboard');
+      } catch (e) {
+        if (mounted) navigate('/login');
+      }
+    };
+    check();
+    return () => { mounted = false; };
+  }, [navigate]);
+  return null;
+}
 
 function AppContent() {
   const location = useLocation();
@@ -27,6 +49,8 @@ function AppContent() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+  <Route path="/product/:id" element={<ProductDetail />} />
+  <Route path="/cart" element={<CartPage />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminRoles />} />
           <Route path="roles" element={<AdminRoles />} />
@@ -37,8 +61,8 @@ function AppContent() {
           <Route path="jersey/remove" element={<AdminJerseyRemove />} />
           <Route path="jersey/discount" element={<AdminJerseyDiscount />} />
         </Route>
-        {/* Redirect root path to the login page */}
-        <Route path="/" element={<LoginPage />} />
+  {/* Root redirects to dashboard when authenticated, otherwise to login */}
+  <Route path="/" element={<AuthRedirect />} />
       </Routes>
       {showFooter && <Footer />}
     </div>

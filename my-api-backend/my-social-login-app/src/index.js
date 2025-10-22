@@ -8,6 +8,12 @@ import reportWebVitals from './reportWebVitals';
 import axios from 'axios';
 
 axios.defaults.withCredentials = true;
+// In development we rely on the CRA dev-server proxy (package.json "proxy") so API calls stay same-origin.
+// Avoid forcing an absolute baseURL here so axios requests remain relative (e.g. '/api/...').
+// Proactively request Sanctum CSRF cookie on app start so subsequent axios POSTs don't 419
+axios.get('/sanctum/csrf-cookie')
+  .then((res) => { console.debug('[csfr] fetched /sanctum/csrf-cookie', res && res.status); })
+  .catch((err) => { console.warn('[csfr] failed to fetch /sanctum/csrf-cookie', err && err.message); });
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

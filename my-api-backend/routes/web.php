@@ -17,6 +17,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Simple health check endpoint for deployment platforms
+Route::get('/health', function () {
+    return response('OK', 200);
+});
+
 use App\Http\Controllers\API\AuthController;
 
 // Social Login and Guest Login (session-based) -----------------------------

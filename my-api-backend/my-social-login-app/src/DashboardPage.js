@@ -106,7 +106,7 @@ const DashboardPage = () => {
       ) : (
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:16}}>
           {products.map(p => (
-            <div key={p.id} style={{border:'1px solid #eee',borderRadius:8,overflow:'hidden',background:'#fff',display:'flex',flexDirection:'column'}}>
+            <div key={p.id} style={{border:'1px solid #eee',borderRadius:8,overflow:'hidden',background:'#fff',display:'flex',flexDirection:'column',cursor:'pointer'}} onClick={() => navigate(`/product/${p.id}`)}>
               <div style={{height:160,background:'#fff',display:'flex',alignItems:'center',justifyContent:'center',borderBottom:'1px solid #f0f0f0'}}>
                 {p.image && !imageErrorIds.includes(p.id) ? (
                   <img

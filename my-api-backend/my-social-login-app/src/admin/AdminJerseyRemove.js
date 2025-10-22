@@ -2,25 +2,9 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { showToast } from '../utils/toast';
+import { showConfirm } from '../components/ConfirmModal';
 
-function askConfirm(message) {
-  return new Promise(resolve => {
-    const handler = (e) => {
-      const { id, message: m, title, resolve: r } = e.detail || {};
-      // not using id here; modal resolves by calling provided resolve
-      // we'll attach a global resolve function via closure
-    };
-    // Instead of listening, dispatch event and create a simple global
-    const ev = new CustomEvent('app-confirm', { detail: { message } });
-    // We need a way to get the user's choice; the modal will call modal.resolve
-    // We'll create a temporary promise by injecting a resolver into the event detail
-    let resFn;
-    const p = new Promise(res => { resFn = res; });
-    ev.detail.resolve = resFn;
-    window.dispatchEvent(ev);
-    return p;
-  });
-}
+// use showConfirm from ConfirmModal which dispatches the event and returns a Promise
 
 export default function AdminJerseyRemove() {
   const [searchParams] = useSearchParams();
@@ -60,7 +44,7 @@ export default function AdminJerseyRemove() {
   const remove = async () => {
     if (!id) return;
     try {
-      const confirmed = await askConfirm('Are you sure you want to delete this product?');
+      const confirmed = await showConfirm('Are you sure you want to delete this product?');
       if (!confirmed) return;
       await axios.get('/sanctum/csrf-cookie');
       await axios.delete(`/api/admin/products/${id}`);
@@ -85,7 +69,7 @@ export default function AdminJerseyRemove() {
                 <div style={{marginTop:8}}>
                   <button onClick={async () => {
                     try {
-                      const confirmed = await askConfirm('Delete "' + p.title + '"?');
+                      const confirmed = await showConfirm('Delete "' + p.title + '"?');
                       if (!confirmed) return;
                       await axios.get('/sanctum/csrf-cookie');
                       await axios.delete(`/api/admin/products/${p.id}`);
