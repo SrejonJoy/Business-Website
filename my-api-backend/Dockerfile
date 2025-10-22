@@ -39,4 +39,5 @@ EXPOSE 8080
 
 # Start Laravel via PHP built-in server. Honors $PORT provided by Railway.
 # Ensure session storage and upload directories exist at runtime (Railway ephemeral FS may not preserve build-time dirs)
-CMD ["sh", "-c", "mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache storage/app/public/products/original storage/app/public/products/resized && chmod -R 777 storage bootstrap/cache && php -S 0.0.0.0:${PORT:-8080} -t public public/index.php"]
+# Create storage symlink for public file access
+CMD ["sh", "-c", "mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache storage/app/public/products/original storage/app/public/products/resized && chmod -R 777 storage bootstrap/cache && ln -sf /app/storage/app/public /app/public/storage && php -S 0.0.0.0:${PORT:-8080} -t public public/index.php"]
