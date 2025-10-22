@@ -1,0 +1,20 @@
+# Ignore unnecessary files for the Docker build context
+
+.git
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Laravel
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+vendor/*
+!.gitkeep
+
+# OS/editor
+.DS_Store
+.idea
+.vscode
