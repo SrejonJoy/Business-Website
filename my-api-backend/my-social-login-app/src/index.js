@@ -8,6 +8,10 @@ import reportWebVitals from './reportWebVitals';
 import axios from 'axios';
 
 axios.defaults.withCredentials = true;
+// Use API base URL from env in production (Vercel). In dev, CRA proxy handles relative '/api' URLs.
+if (process.env.REACT_APP_API_BASE_URL) {
+  axios.defaults.baseURL = process.env.REACT_APP_API_BASE_URL;
+}
 // In development we rely on the CRA dev-server proxy (package.json "proxy") so API calls stay same-origin.
 // Avoid forcing an absolute baseURL here so axios requests remain relative (e.g. '/api/...').
 // Proactively request Sanctum CSRF cookie on app start so subsequent axios POSTs don't 419

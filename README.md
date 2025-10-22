@@ -129,6 +129,18 @@ Notes for other frameworks
 - CRA: Output is `build/`; build with `npm run build`.
 - Next.js: Set `NEXT_PUBLIC_API_BASE_URL` and use Next.js fetch from server/client appropriately. No SPA fallback needed.
 
+	### Important for session-based auth (Sanctum)
+
+	If your frontend runs on Vercel and your API on Railway under a different domain, and you rely on Laravel Sanctum session cookies:
+
+	- Backend env (Railway → Variables):
+		- `SANCTUM_STATEFUL_DOMAINS=<your-project>.vercel.app,<your-custom-domain>`
+		- `SESSION_SECURE_COOKIE=true`
+		- `SESSION_SAME_SITE=none`
+		- Keep `supports_credentials=true` in `config/cors.php` (already true)
+	- Frontend (CRA) code already sets `axios.defaults.withCredentials = true` and uses `REACT_APP_API_BASE_URL` in production.
+	- After changing backend env, clear config cache or redeploy so settings take effect.
+
 ### Running migrations and seeders
 
 - One-time schema setup: `php artisan migrate --force`
