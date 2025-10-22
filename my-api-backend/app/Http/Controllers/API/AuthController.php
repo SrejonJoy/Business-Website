@@ -31,7 +31,8 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             // Log and redirect back to frontend with an error flag
             logger()->error('Socialite callback failed', ['provider' => $provider, 'error' => $e->getMessage()]);
-            return redirect('http://localhost:3000/login?social_error=1');
+            $frontend = rtrim(config('app.frontend_url'), '/');
+            return redirect($frontend . '/login?social_error=1');
         }
 
         // Use the provider email when available; otherwise create a unique fallback
@@ -48,8 +49,9 @@ class AuthController extends Controller
 
         Auth::login($user);
 
-        // Redirect to the frontend blank page
-        return redirect('http://localhost:3000/dashboard');
+    // Redirect to the frontend app (dashboard/home)
+    $frontend = rtrim(config('app.frontend_url'), '/');
+    return redirect($frontend . '/dashboard');
     }
     // Handle Guest Login
     public function guestLogin(Request $request)
