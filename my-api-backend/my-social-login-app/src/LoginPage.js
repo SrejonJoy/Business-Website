@@ -7,8 +7,10 @@ axios.defaults.withCredentials = true;
 const LoginPage = () => {
   // Direct link to the backend for social login
   const googleLogin = () => {
-    // Navigate directly to the backend so Laravel can initialize the OAuth session/state correctly
-  window.location.href = 'http://localhost:8000/auth/google/redirect';
+    // Use API base URL if provided (production), fallback to relative in dev
+    const base = (process.env.REACT_APP_API_BASE_URL || '').trim().replace(/^['"]|['"]$/g, '');
+    const url = base ? `${base}/auth/google/redirect` : '/auth/google/redirect';
+    window.location.href = url;
   };
 
   // Function to handle guest login via an API call
