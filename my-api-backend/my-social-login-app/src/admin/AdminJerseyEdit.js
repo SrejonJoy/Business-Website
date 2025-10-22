@@ -67,7 +67,6 @@ export default function AdminJerseyEdit() {
   const submit = async (e) => {
     e.preventDefault();
     try {
-      await axios.get('/sanctum/csrf-cookie');
       const payload = { ...product };
       await axios.put(`/api/admin/products/${id}`, payload);
       window.dispatchEvent(new CustomEvent('app-toast', { detail: { message: 'Updated', type: 'success', timeout: 2500 } }));

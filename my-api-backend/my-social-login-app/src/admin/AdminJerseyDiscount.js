@@ -43,7 +43,6 @@ export default function AdminJerseyDiscount() {
     if (!id) return;
     if (!value) return alert('Please enter discount value');
     try {
-      await axios.get('/sanctum/csrf-cookie');
       await axios.post(`/api/admin/products/${id}/discount`, { type, value });
       alert('Discount applied');
       navigate('/admin/jersey');

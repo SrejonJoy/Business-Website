@@ -8,7 +8,6 @@ const AdminRoles = () => {
   useEffect(() => {
     (async () => {
       try {
-        await axios.get('/sanctum/csrf-cookie');
         const res = await axios.get('/api/admin/users');
         setUsers(res.data || []);
       } catch (e) {

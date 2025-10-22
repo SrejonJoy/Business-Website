@@ -7,7 +7,6 @@ const AdminOrders = () => {
   useEffect(() => {
     (async () => {
       try {
-        await axios.get('/sanctum/csrf-cookie');
         const res = await axios.get('/api/admin/orders');
         setOrders(res.data || []);
       } catch (e) {

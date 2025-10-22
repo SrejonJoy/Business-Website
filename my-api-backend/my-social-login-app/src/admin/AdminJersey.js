@@ -65,24 +65,14 @@ const AdminJersey = () => {
   const submit = async (e) => {
     e.preventDefault();
     try {
-      try {
-        console.debug('[admin] ensuring CSRF cookie before submit');
-        await axios.get('/sanctum/csrf-cookie');
-        await axios.post('/api/admin/products', form);
-      } catch (err) {
-        console.warn('[admin] submit failed, status=', err?.response?.status, err?.message);
-        if (err?.response?.status === 419) {
-          // try to refresh CSRF cookie and retry once
-          try { console.debug('[admin] 419 received, retrying after CSRF refresh'); await axios.get('/sanctum/csrf-cookie'); await axios.post('/api/admin/products', form); }
-          catch(e) { throw e; }
-        } else throw err;
-      }
+      await axios.post('/api/admin/products', form);
       window.dispatchEvent(new CustomEvent('app-toast', { detail: { message: 'Product created', type: 'success', timeout: 3000 } }));
       setForm(initialForm);
       fetchProducts();
     } catch (e) {
-      console.error(e);
-      window.dispatchEvent(new CustomEvent('app-toast', { detail: { message: 'Create product failed: ' + (e.response?.data?.message || e.message), type: 'error', timeout: 6000 } }));
+      console.error('[admin] Create product failed:', e);
+      const msg = e.response?.data?.message || e.message;
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { message: 'Create product failed: ' + msg, type: 'error', timeout: 6000 } }));
     }
   };
 
@@ -90,34 +80,20 @@ const AdminJersey = () => {
   const uploadImage = async (file) => {
     if (!file) return;
     try {
-      // ensure CSRF cookie and retry-on-419
-      try {
-        console.debug('[admin] prefetching CSRF cookie for upload');
-        await axios.get('/sanctum/csrf-cookie');
-      } catch(e) {
-        console.warn('[admin] CSRF prefetch failed, will attempt upload and retry on 419', e && e.message);
-      }
+      console.debug('[admin] starting image upload to /api/admin/products/upload', file?.name, file?.size);
       const fd = new FormData();
       fd.append('image', file);
-      let res;
-      try {
-        console.debug('[admin] starting image upload to /api/admin/products/upload', file && file.name, file && file.size);
-        res = await axios.post('/api/admin/products/upload', fd, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-          onUploadProgress: (progressEvent) => {
-            if (progressEvent.total) {
-              const pct = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-              setUploadProgress(pct);
-            }
+      
+      const res = await axios.post('/api/admin/products/upload', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const pct = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(pct);
           }
-        });
-      } catch (err) {
-        if (err?.response?.status === 419) {
-          // refresh CSRF cookie then retry once
-          try { console.debug('[admin] upload received 419, fetching CSRF cookie and retrying upload'); await axios.get('/sanctum/csrf-cookie'); res = await axios.post('/api/admin/products/upload', fd, { headers: { 'Content-Type': 'multipart/form-data' }, onUploadProgress: (progressEvent) => { if (progressEvent.total) { const pct = Math.round((progressEvent.loaded * 100) / progressEvent.total); setUploadProgress(pct); } } }); }
-          catch (e) { throw e; }
-        } else throw err;
-      }
+        }
+      });
+      
       if (res.data && res.data.url) {
         setForm(f => ({ ...f, image: res.data.url }));
         setUploadPreview(res.data.url);
@@ -125,8 +101,9 @@ const AdminJersey = () => {
         window.dispatchEvent(new CustomEvent('app-toast', { detail: { message: 'Image uploaded', type: 'success' } }));
       }
     } catch (e) {
-      console.error('Upload failed', e);
-      window.dispatchEvent(new CustomEvent('app-toast', { detail: { message: 'Image upload failed: ' + (e.response?.data?.message || e.message), type: 'error' } }));
+      console.error('[admin] Upload failed:', e);
+      const msg = e.response?.data?.message || e.message;
+      window.dispatchEvent(new CustomEvent('app-toast', { detail: { message: 'Image upload failed: ' + msg, type: 'error' } }));
     }
   };
 

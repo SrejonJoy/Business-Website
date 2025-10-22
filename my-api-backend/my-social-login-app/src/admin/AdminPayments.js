@@ -7,7 +7,6 @@ const AdminPayments = () => {
   useEffect(() => {
     (async () => {
       try {
-        await axios.get('/sanctum/csrf-cookie');
         const res = await axios.get('/api/admin/payments');
         setPayments(res.data || []);
       } catch (e) {

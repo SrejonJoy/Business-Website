@@ -46,7 +46,6 @@ export default function AdminJerseyRemove() {
     try {
       const confirmed = await showConfirm('Are you sure you want to delete this product?');
       if (!confirmed) return;
-      await axios.get('/sanctum/csrf-cookie');
       await axios.delete(`/api/admin/products/${id}`);
       showToast('Deleted', 'success');
       navigate('/admin/jersey');
@@ -71,7 +70,6 @@ export default function AdminJerseyRemove() {
                     try {
                       const confirmed = await showConfirm('Delete "' + p.title + '"?');
                       if (!confirmed) return;
-                      await axios.get('/sanctum/csrf-cookie');
                       await axios.delete(`/api/admin/products/${p.id}`);
                       showToast('Deleted', 'success');
                       // refresh list
