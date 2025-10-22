@@ -56,7 +56,7 @@ We’ve added a `Procfile` so Railway (and similar platforms) can start the web 
 	- Option B (from a local Laravel env): `php artisan key:generate --show` and paste the result.
 
 5. Set the service Start Command to use the `Procfile` (Railway will detect it) or explicitly set:
-	- `php artisan serve --host 0.0.0.0 --port $PORT`
+	- `php -S 0.0.0.0:$PORT -t public public/index.php`
 
 6. Add a Deploy Hook (optional): after successful build, run migrations. You can do this via Railway “Deploy” → “Actions” → “Run” with command:
 	- `php artisan migrate --force`
@@ -69,6 +69,7 @@ Tips
 - Laravel’s storage is ephemeral on most PaaS providers. If you handle file uploads, use S3/Cloud Storage and configure `FILESYSTEM_DISK=s3` and credentials.
 - Cache/Queue: consider Redis add-ons and set `CACHE_DRIVER=redis`, `QUEUE_CONNECTION=redis` if needed.
  - CORS: set `CORS_ALLOWED_ORIGINS` to your frontend origin(s); defaults include localhost.
+ - If your Railway build fails mentioning `php80 has been dropped`, set a service variable `NIXPACKS_PHP_VERSION=8.2` and redeploy.
 
 ### 3) Deploy the frontend (Vercel or Netlify)
 
