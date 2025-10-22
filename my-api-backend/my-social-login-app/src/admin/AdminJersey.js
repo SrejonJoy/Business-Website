@@ -95,10 +95,11 @@ const AdminJersey = () => {
       });
       
       if (res.data && res.data.url) {
+        console.log('[admin] Upload response URL:', res.data.url);
         setForm(f => ({ ...f, image: res.data.url }));
         setUploadPreview(res.data.url);
         setUploadProgress(0);
-        window.dispatchEvent(new CustomEvent('app-toast', { detail: { message: 'Image uploaded', type: 'success' } }));
+        window.dispatchEvent(new CustomEvent('app-toast', { detail: { message: 'Image uploaded: ' + res.data.url, type: 'success', timeout: 8000 } }));
       }
     } catch (e) {
       console.error('[admin] Upload failed:', e);
