@@ -18,9 +18,13 @@ if (process.env.REACT_APP_API_BASE_URL) {
     // eslint-disable-next-line no-new
     new URL(cleaned);
     axios.defaults.baseURL = cleaned;
+    // Help debug in production by logging once (harmless)
+    console.info('[env] API base URL set to', axios.defaults.baseURL);
   } catch (e) {
     console.warn('[env] Invalid REACT_APP_API_BASE_URL value:', raw);
   }
+} else {
+  console.info('[env] REACT_APP_API_BASE_URL not set; using relative URLs');
 }
 // In development we rely on the CRA dev-server proxy (package.json "proxy") so API calls stay same-origin.
 // Avoid forcing an absolute baseURL here so axios requests remain relative (e.g. '/api/...').
