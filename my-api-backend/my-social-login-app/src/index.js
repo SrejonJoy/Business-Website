@@ -10,7 +10,17 @@ import axios from 'axios';
 axios.defaults.withCredentials = true;
 // Use API base URL from env in production (Vercel). In dev, CRA proxy handles relative '/api' URLs.
 if (process.env.REACT_APP_API_BASE_URL) {
-  axios.defaults.baseURL = process.env.REACT_APP_API_BASE_URL;
+  // Be defensive: trim and strip accidental quotes from the value set in Vercel
+  const raw = process.env.REACT_APP_API_BASE_URL;
+  const cleaned = raw.trim().replace(/^['"]|['"]$/g, '');
+  try {
+    // Validate URL to avoid "Failed to construct 'URL'" errors when axios builds the request
+    // eslint-disable-next-line no-new
+    new URL(cleaned);
+    axios.defaults.baseURL = cleaned;
+  } catch (e) {
+    console.warn('[env] Invalid REACT_APP_API_BASE_URL value:', raw);
+  }
 }
 // In development we rely on the CRA dev-server proxy (package.json "proxy") so API calls stay same-origin.
 // Avoid forcing an absolute baseURL here so axios requests remain relative (e.g. '/api/...').
