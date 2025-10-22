@@ -36,3 +36,29 @@ Route::get('/diagnostic', function () {
     \Illuminate\View\Middleware\ShareErrorsFromSession::class,
     \App\Http\Middleware\VerifyCsrfToken::class,
 ]);
+
+// Test CSRF cookie endpoint with error catching
+Route::get('/test-csrf', function () {
+    try {
+        // Manually try to set a session value
+        session()->put('test', 'value');
+        $sessionId = session()->getId();
+        
+        return response()->json([
+            'status' => 'success',
+            'session_id' => $sessionId,
+            'session_test' => session('test'),
+            'request_origin' => request()->header('origin'),
+            'request_referer' => request()->header('referer'),
+            'request_host' => request()->getHost(),
+            'request_scheme' => request()->getScheme(),
+            'is_https' => request()->secure(),
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
