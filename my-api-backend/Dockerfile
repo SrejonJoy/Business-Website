@@ -34,4 +34,5 @@ RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --opt
 EXPOSE 8080
 
 # Start Laravel via PHP built-in server. Honors $PORT provided by Railway.
-CMD ["sh", "-c", "php -S 0.0.0.0:${PORT:-8080} -t public public/index.php"]
+# Ensure session storage exists at runtime (Railway ephemeral FS may not preserve build-time dirs)
+CMD ["sh", "-c", "mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache && chmod -R 777 storage bootstrap/cache && php -S 0.0.0.0:${PORT:-8080} -t public public/index.php"]
