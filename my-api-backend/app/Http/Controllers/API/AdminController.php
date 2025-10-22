@@ -235,8 +235,10 @@ class AdminController extends Controller
             }
         }
 
-        $url = Storage::url($resizedPath);
+        // Generate full absolute URL for cross-domain access
+        $relativeUrl = Storage::url($resizedPath);
+        $absoluteUrl = config('app.url') . $relativeUrl;
 
-        return response()->json(['url' => $url, 'path' => $resizedPath, 'original' => $path]);
+        return response()->json(['url' => $absoluteUrl, 'path' => $resizedPath, 'original' => $path]);
     }
 }
