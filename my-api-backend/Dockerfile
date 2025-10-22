@@ -3,7 +3,7 @@ FROM php:8.2-cli-alpine
 
 # Install system deps and PHP extensions required by Laravel + MySQL
 RUN apk add --no-cache bash git curl libzip-dev oniguruma-dev icu-dev unzip \
-    && docker-php-ext-install pdo_mysql bcmath \
+    && docker-php-ext-install pdo_mysql bcmath mbstring intl zip \
     && rm -rf /var/cache/apk/*
 
 # Install Composer
