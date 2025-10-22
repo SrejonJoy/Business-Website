@@ -11,16 +11,19 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
+# Composer runs as root inside container builds; suppress warning
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
 # Copy composer manifests separately to leverage Docker layer caching
 COPY composer.json composer.lock* ./
 
-# Install PHP dependencies (no dev) and optimize autoloader
-RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
+# First install: warm vendor cache without running scripts (artisan not copied yet)
+RUN composer install --no-dev --no-scripts --prefer-dist --no-interaction --no-progress
 
 # Copy the rest of the application
 COPY . .
 
-# Ensure vendor is up to date after full source is copied (handles newly added packages)
+# Ensure vendor is up to date after full source is copied (now scripts can run)
 RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --optimize-autoloader
 
 # Expose default port (Railway will set $PORT at runtime; we default to 8080)
