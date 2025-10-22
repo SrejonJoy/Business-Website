@@ -43,11 +43,14 @@ Route::get('/test-csrf', function () {
         // Manually try to set a session value
         session()->put('test', 'value');
         $sessionId = session()->getId();
+        $csrfToken = csrf_token();
         
         return response()->json([
             'status' => 'success',
             'session_id' => $sessionId,
             'session_test' => session('test'),
+            'csrf_token' => $csrfToken,
+            'cookies_sent' => request()->cookies->all(),
             'request_origin' => request()->header('origin'),
             'request_referer' => request()->header('referer'),
             'request_host' => request()->getHost(),
@@ -62,3 +65,37 @@ Route::get('/test-csrf', function () {
         ], 500);
     }
 });
+
+// Check what cookies would be set by /sanctum/csrf-cookie
+Route::get('/test-xsrf-cookie', function () {
+    // This endpoint mimics what /sanctum/csrf-cookie does
+    $token = csrf_token();
+    
+    // Check if XSRF-TOKEN would be set in response
+    $response = response()->json([
+        'message' => 'XSRF token should be in cookies',
+        'csrf_token_value' => $token,
+        'session_config' => [
+            'secure' => config('session.secure'),
+            'same_site' => config('session.same_site'),
+            'domain' => config('session.domain'),
+            'path' => config('session.path'),
+        ],
+        'note' => 'Check Set-Cookie headers in browser dev tools'
+    ]);
+    
+    // Manually queue XSRF-TOKEN cookie to verify it's being set
+    cookie()->queue(
+        'XSRF-TOKEN',
+        $token,
+        config('session.lifetime', 120),
+        config('session.path', '/'),
+        config('session.domain'),
+        config('session.secure', false),
+        false, // httpOnly = false (must be readable by JS)
+        false, // raw
+        config('session.same_site', 'lax')
+    );
+    
+    return $response;
+})->middleware('web');

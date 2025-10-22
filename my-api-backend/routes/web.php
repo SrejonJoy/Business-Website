@@ -30,6 +30,12 @@ Route::get('/health', function () {
 
 use App\Http\Controllers\API\AuthController;
 
+// Sanctum CSRF Cookie Route - Must be in web middleware for XSRF-TOKEN cookie to be set properly
+// This overrides the default Sanctum route to ensure it uses web middleware stack
+Route::get('/sanctum/csrf-cookie', function () {
+    return response()->noContent();
+})->middleware('web');
+
 // Social Login and Guest Login (session-based) -----------------------------
 Route::get('/auth/{provider}/redirect', [AuthController::class, 'redirectToProvider']);
 Route::get('/auth/{provider}/callback', [AuthController::class, 'handleProviderCallback']);
