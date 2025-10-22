@@ -28,6 +28,15 @@ Route::get('/health', function () {
     \App\Http\Middleware\VerifyCsrfToken::class,
 ]);
 
+// Serve storage files (for PHP built-in server that doesn't follow symlinks properly)
+Route::get('/storage/{path}', function ($path) {
+    $filePath = storage_path('app/public/' . $path);
+    if (!file_exists($filePath)) {
+        abort(404);
+    }
+    return response()->file($filePath);
+})->where('path', '.*');
+
 use App\Http\Controllers\API\AuthController;
 
 // Sanctum CSRF Cookie Route - Must be in web middleware for XSRF-TOKEN cookie to be set properly
