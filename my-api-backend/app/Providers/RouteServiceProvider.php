@@ -35,6 +35,9 @@ class RouteServiceProvider extends ServiceProvider
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
+            
+            // Diagnostic route (no middleware)
+            require base_path('routes/diagnostic.php');
         });
     }
 
